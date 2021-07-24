@@ -44,8 +44,6 @@
         </select>
         <label>Тип карты</label>
         <!--Дополнительные элементы-->
-        <p>Фильтры</p>
-        <p>Слои</p>
       </div>              
       <!--Контейнер для дотображения карты-->
       <div class="col s12 m9 map-container">
@@ -78,7 +76,7 @@
           L.DomUtil.empty(container)
           /// ????????????? вторая и последующие карты не передвигаются
         }
-        var mymap = L.map('map').setView([latitude, longitude], 17);
+        var mymap = L.map('map').setView([latitude, longitude], 10);
         var current_map =  document.getElementById("map-list").value
         // можно отрисовывать карты вручную...
         if (current_map=="Google"){        
