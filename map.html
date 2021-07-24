@@ -1,1 +1,124 @@
 
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--materializecss-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!--leaflet-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+  </head>
+  <style>
+    .map {
+        /* высота и ширина div котором отображается карта
+        подгоняем под свои нужды*/
+        height: 90vh;     
+        width: 98%;
+        position: absolute;
+      }
+    .map-container {
+        position: relative;
+      }
+  </style>
+
+  <body>
+    <!--Заголовок-->
+    <div class="row">
+      <div class="col m12 s12">
+        <nav>
+          <div class="nav-wrapper">
+            <a href="#!" class="brand-logo"><i class="material-icons">cloud</i>Пример отрисовки карты</a>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <!--Боковая панель-->
+    <div class="row">
+      <div class="input-field col s12 m3">
+        <!--Список выбора текущей карты-->
+        <select class="map-list" id="map-list">
+          <option value="" disabled selected></option>
+          <option value="Stamen.Watercolor">Stamen.Watercolor</option>
+          <option value="Google">Google</option>
+          <option value="OSM">OSM</option>
+        </select>
+        <label>Тип карты</label>
+        <!--Дополнительные элементы-->
+        <p>Фильтры</p>
+        <p>Слои</p>
+      </div>              
+      <!--Контейнер для дотображения карты-->
+      <div class="col s12 m9 map-container">
+          <div id="map" class="map"></div>
+      </div>    
+    </div>
+    <!--materializecss-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!--leaflet-->    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+    <!--один из провайдеров карт-->    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-providers/1.12.0/leaflet-providers.min.js"> </script> 
+
+    <script>
+      // materializecss - инициализация селекта карт
+      $(document).ready(function(){
+          $('select').formSelect();
+      });
+      // если браузер отслеживает получение текущей геопозиции
+      function success(position) {
+        const latitude  = position.coords.latitude;
+        const longitude = position.coords.longitude;  
+        var container = L.DomUtil.get('map');
+        // удаление старой карты для прорисовки новой выбранной в селекте
+        if(container != null){
+          container._leaflet_id = null;
+          L.DomUtil.empty(container)
+          /// ????????????? вторая и последующие карты не передвигаются
+        }
+        var mymap = L.map('map').setView([latitude, longitude], 17);
+        var current_map =  document.getElementById("map-list").value
+        // можно отрисовывать карты вручную...
+        if (current_map=="Google"){        
+          // карта Google
+          L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3']}).addTo(mymap);
+            return;
+        }
+
+        if (current_map=="OSM"){
+            // карта OSM
+            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', 
+            {
+              maxZoom: 18,
+              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+              id: 'mapbox/streets-v11',
+              tileSize: 512,
+              zoomOffset: -1
+            }).addTo(mymap);
+          return;
+        } 
+        // ... а можно через провайдер карт
+        L.tileLayer.provider(current_map).addTo(mymap);    
+      };
+
+      // если браузер не поддердивает определение геопозиции 
+      function error() {
+        // можно вывести соотвествующее сообщение
+      };
+
+      // выбор в селекте карты для отрисовки
+      $( "#map-list" ).change(function() {
+        if(navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(success, error);
+        }
+      });
+    </script>
+  </body>
+</html>
