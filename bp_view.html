@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+
+    <!-- viewer distro (without pan and zoom) -->
+    <!--
+    <script src="https://unpkg.com/bpmn-js@17.8.1/dist/bpmn-viewer.development.js"></script>
+    -->
+
+    <!-- required viewer styles -->
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17.8.1/dist/assets/bpmn-js.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@materializecss/materialize@2.0.3-alpha/dist/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bpmn-js-token-simulation-plugin@0.16.0/client/assets/bpmn-js-token-simulation/css/bpmn-js-token-simulation.min.css">
+
+          <!-- Material Icons -->
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+          <!-- Material Symbols - Outlined Set -->
+          <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+          <!-- Material Symbols - Rounded Set -->
+          <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+          <!-- Material Symbols - Sharp Set -->
+
+          <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" rel="stylesheet" />
+
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bpmn-js-token-simulation-plugin@0.16.0/client/assets/bpmn-js-token-simulation/css/bpmn-js-token-simulation.min.css">
+
+
+
+    <!-- viewer distro (with pan and zoom) -->
+    <script src="https://unpkg.com/bpmn-js@17.8.1/dist/bpmn-navigated-viewer.development.js"></script>
+
+
+    <!-- needed for this example only -->
+    <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+
+    <!-- example styles -->
+    <style>
+      html, body, #canvas {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .diagram-note {
+        background-color: rgba(66, 180, 21, 0.7);
+        color: White;
+        border-radius: 5px;
+        font-family: Arial;
+        font-size: 12px;
+        padding: 5px;
+        min-height: 16px;
+        width: 50px;
+        text-align: center;
+      }
+
+      .needs-discussion:not(.djs-connection) .djs-visual > :nth-child(1) {
+        stroke: rgba(66, 180, 21, 0.7) !important; /* color elements as red */
+      }
+    </style>
+  </head>
+  <body>
+      <nav>
+        <div class="nav-wrapper teal grey lighten-5">
+          <a href="" class="brand-logo black-text center"><b>БП Datapult</b></a> 
+          <ul class="left">
+            <li><a href="#" data-target="slide-out" class="sidenav-trigger  black-text"><i class="material-icons">menu</i></a>            </li>
+          </ul>         
+        </div>
+      </nav>
+    <div>
+      <ul id="slide-out" class="sidenav">
+        <li><a class="diagram" data-diagram-name="payment">Оплатить экспорт</a></li>
+        <li><a class="diagram" data-diagram-name="create_zayavka_export">Создать заявку на экспорт</a></li>
+        <li><a class="diagram" data-diagram-name="filter_by_sirenlist">Список сирен для поиска</a></li>
+      </ul>
+  </div>
+
+  <div id="canvas"></div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/@materializecss/materialize@2.0.3-alpha/dist/js/materialize.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@yape/plugin-bpmn-js-token-simulator@1.0.38/browser/yape-plugin-bpmn-js-token-simulator.min.js"></script>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var sidenav_elems = document.querySelectorAll('.sidenav');
+      var sn_instances = M.Sidenav.init(sidenav_elems, {});
+      var dropdown_elems = document.querySelectorAll('.dropdown-trigger');
+      var dd_instances = M.Dropdown.init(dropdown_elems);
+    });
+
+      var bpmnViewer = new BpmnJS({container: '#canvas'});
+      async function openDiagram(bpmnXML) {
+        try {
+          await bpmnViewer.importXML(bpmnXML);
+          var canvas = bpmnViewer.get('canvas');
+          var overlays = bpmnViewer.get('overlays');
+          canvas.zoom('fit-viewport');
+          overlays.add('SCAN_OK', 'note', {
+            position: {
+              bottom: 0,
+              right: 0
+            },
+            html: '<div class="diagram-note">Mixed up the labels?</div>'
+          });
+          canvas.addMarker('SCAN_OK', 'needs-discussion');
+        } catch (err) {
+          //console.error('could not import BPMN 2.0 diagram', err);
+        }
+      }
+
+      $(".diagram").click(function() {        
+        var diagramUrl = '/models/'+$(this).data('diagramName')+'.bpmn';
+        $.get(diagramUrl, openDiagram, 'text');
+        
+        var sidenav_elems = document.querySelectorAll('.sidenav');
+        var instance = M.Sidenav.getInstance(sidenav_elems[0]);
+        instance.close()
+      })
+    </script>
+
+
+
+</html>
